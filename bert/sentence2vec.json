@@ -1,0 +1,11 @@
+{
+  "bert_model_root": "/home/idm/dzt/bert/chinese_L-12_H-768_A-12/",
+  "vocab_file": "/home/idm/dzt/bert/chinese_L-12_H-768_A-12/vocab.txt",
+  "bert_config_file": "/home/idm/dzt/bert/chinese_L-12_H-768_A-12/bert_config.json",
+  "init_checkpoint": "/home/idm/dzt/bert/chinese_L-12_H-768_A-12/bert_model.ckpt",
+  "feature_pooling_layer": -2, 
+  "use_one_hot_embeddings": false, 
+  "max_seq_length": 128, 
+  "batch_size": 8, 
+  "do_lower_case": false 
+}
