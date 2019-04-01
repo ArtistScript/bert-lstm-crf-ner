@@ -74,8 +74,9 @@ def evaluate(iterable, options=None):
     last_guessed_type = ''    # type of previous chunk tag in corpus
 
     for line in iterable:
-        line = line.rstrip('\r\n')
+        line = line.rstrip('\r\n')  #去掉首位空字符
 
+        #使用自定义分隔符分隔，token，真实标记，预测标记
         if options.delimiter == ANY_SPACE:
             features = line.split()
         else:
@@ -86,37 +87,44 @@ def evaluate(iterable, options=None):
         elif num_features != len(features) and len(features) != 0:
             raise FormatError('unexpected number of features: %d (%d)' %
                               (len(features), num_features))
-
-        if len(features) == 0 or features[0] == options.boundary:
+        #options是自定义的一些分隔符，边界之类
+        if len(features) == 0 or features[0] == options.boundary:#遇到了边界
             features = [options.boundary, 'O', 'O']
         if len(features) < 3:
             raise FormatError('unexpected number of features in line %s' % line)
 
-        guessed, guessed_type = parse_tag(features.pop())
+        #最先pop出来的是label_test最右边的元素，是predict的值
+        guessed, guessed_type = parse_tag(features.pop()) #中间有一个-的标记形式，不是O。切分开始/结束，标记类型
         correct, correct_type = parse_tag(features.pop())
-        first_item = features.pop(0)
+        first_item = features.pop(0)#第一个元素
 
         if first_item == options.boundary:
             guessed = 'O'
 
+        #？标记是否一句话的结束
         end_correct = end_of_chunk(last_correct, correct,
                                    last_correct_type, correct_type)
         end_guessed = end_of_chunk(last_guessed, guessed,
                                    last_guessed_type, guessed_type)
+        #判断是否是一句话的开始
         start_correct = start_of_chunk(last_correct, correct,
                                        last_correct_type, correct_type)
         start_guessed = start_of_chunk(last_guessed, guessed,
                                        last_guessed_type, guessed_type)
-
+        #目前处理的块是正确的，直到现在
         if in_correct:
+            #如果是正确到达句子的结尾，刷新结尾标志位，并让正确的块数+1
             if (end_correct and end_guessed and
                 last_guessed_type == last_correct_type):
                 in_correct = False
                 counts.correct_chunk += 1
+                #上一个正确的type+1
                 counts.t_correct_chunk[last_correct_type] += 1
+            #遇到错误，标志位置false
             elif (end_correct != end_guessed or guessed_type != correct_type):
                 in_correct = False
 
+        #如果是新一行的开始，把语块是否正确的标记位置为正确
         if start_correct and start_guessed and guessed_type == correct_type:
             in_correct = True
 
@@ -127,8 +135,10 @@ def evaluate(iterable, options=None):
             counts.found_guessed += 1
             counts.t_found_guessed[guessed_type] += 1
         if first_item != options.boundary:
+            #判断预测的标记，是否正确
             if correct == guessed and guessed_type == correct_type:
                 counts.correct_tags += 1
+            #累加遇到的token
             counts.token_counter += 1
 
         last_guessed = guessed

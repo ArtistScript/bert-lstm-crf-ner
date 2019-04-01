@@ -128,13 +128,16 @@ class NerProcessor(DataProcessor):
         return self.labels
 
     def _create_example(self, lines, set_type):
+        #比如set_type是train，就表示训练数据
         examples = []
         for (i, line) in enumerate(lines):
             guid = "%s-%s" % (set_type, i)
+            #使用bert内部的tokenization包，把字符串转化成unicode
             text = tokenization.convert_to_unicode(line[1])
             label = tokenization.convert_to_unicode(line[0])
             # if i == 0:
             #     print('label: ', label)
+            #模型训练的输入类，guid为唯一数据id
             examples.append(InputExample(guid=guid, text=text, label=label))
         return examples
 
@@ -227,7 +230,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
         tokens = tokens[0:(max_seq_length - 2)]  # -2 的原因是因为序列需要加一个句首和句尾标志
         labels = labels[0:(max_seq_length - 2)]
     ntokens = []
-    segment_ids = []
+    segment_ids = []  #segment_ids的作用是？？？
     label_ids = []
     ntokens.append("[CLS]")  # 句子开始设置CLS 标志
     segment_ids.append(0)
@@ -241,8 +244,9 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
     segment_ids.append(0)
     # append("O") or append("[SEP]") not sure!
     label_ids.append(label_map["[SEP]"])
+    #调用bert内部的token2id函数，把token转化成bert使用的tokenid
     input_ids = tokenizer.convert_tokens_to_ids(ntokens)  # 将序列中的字(ntokens)转化为ID形式
-    input_mask = [1] * len(input_ids)
+    input_mask = [1] * len(input_ids)   #mask是隐藏的token，用于模型训练
     # label_mask = [1] * len(input_ids)
     # padding, 使用
     #小于序列长度的，进行补全操作
@@ -273,7 +277,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
         tf.logging.info("label_ids: %s" % " ".join([str(x) for x in label_ids]))
         # tf.logging.info("label_mask: %s" % " ".join([str(x) for x in label_mask]))
 
-    # 结构化为一个类
+    # 结构化为一个类，使用自定义类保存训练index化数据，
     feature = InputFeatures(
         input_ids=input_ids,
         input_mask=input_mask,
@@ -281,7 +285,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
         label_ids=label_ids,
         # label_mask = label_mask
     )
-    # mode='test'的时候才有效
+    # mode='test'的时候才有效，把token写入文件
     write_tokens(ntokens, output_dir, mode)
     return feature
 
@@ -304,6 +308,7 @@ def filed_based_convert_examples_to_features(
         if ex_index % 5000 == 0:
             tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
         # 对于每一个训练样本,将一个样本进行分析，然后将字转化为id, 标签转化为id,然后结构化到InputFeatures对象中
+        # 返回的是bert模型训练需要的index化token，label，mask，segment等信息
         feature = convert_single_example(ex_index, example, label_list, max_seq_length, tokenizer, output_dir, mode)
 
         def create_int_feature(values):
@@ -317,6 +322,7 @@ def filed_based_convert_examples_to_features(
         features["label_ids"] = create_int_feature(feature.label_ids)
         # features["label_mask"] = create_int_feature(feature.label_mask)
         # tf.train.Example/Feature 是一种协议，方便序列化？？？
+        # Example中存放features特征，放入example是为了便于把特征序列化存储
         tf_example = tf.train.Example(features=tf.train.Features(feature=features))
         writer.write(tf_example.SerializeToString())
 
@@ -332,6 +338,7 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
     }
 
     def _decode_record(record, name_to_features):
+        #把recod变成字典example？
         example = tf.parse_single_example(record, name_to_features)
         for name in list(example.keys()):
             t = example[name]
@@ -562,7 +569,7 @@ def train(args):
     #一般都是True
     if args.do_train and args.do_eval:
         # 加载训练数据，会自动拼接文件夹和train.txt
-        #返回的训练数据是一个list，每个元素是两个字符串，空格分隔字，空格分隔字标记
+        #返回的训练数据是一个list，每个元素是两个字符串，空格分隔字，空格分隔字标记，并写入训练examples类中
         train_examples = processor.get_train_examples(args.data_dir)
         #训练步数
         num_train_steps = int(
@@ -609,6 +616,7 @@ def train(args):
     if args.do_train and args.do_eval:
         # 1. 将数据转化为tf_record 数据,并把训练数据序列化，并写出到文件
         train_file = os.path.join(args.output_dir, "train.tf_record")
+        #ok
         if not os.path.exists(train_file):
             filed_based_convert_examples_to_features(
                 train_examples, label_list, args.max_seq_length, tokenizer, train_file, args.output_dir)
