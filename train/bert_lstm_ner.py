@@ -397,7 +397,10 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
         total_loss, logits, trans, pred_ids = create_model(
             bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
             num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-
+        tf.summary.scalar('total_loss', total_loss)
+        # tf.summary.scalar('logits',logits)
+        # tf.summary.scalar('trans',trans)
+        # tf.summary.scalar('pred_ids',pred_ids)
         #所有需要训练的变量
         tvars = tf.trainable_variables()
         # 加载BERT模型，assignmen_map，加载的预训练变量值
@@ -651,7 +654,19 @@ def train(args):
             min_steps=0,
             run_every_secs=None,
             run_every_steps=args.save_checkpoints_steps)
+        #outpute summary
+        # summary_hook = tf.train.SummarySaverHook(
+        #     100,
+        #     output_dir='./log',
+        #     summary_op=tf.summary.merge_all()
+        # )
+        #如果加入summary_hook,scalar元素无法显示，很奇怪
+        summary_hook = tf.train.SummarySaverHook(
+            save_secs=1,
+            output_dir='./log',
+            scaffold=tf.train.Scaffold(summary_op=tf.summary.merge_all()))
 
+        #train_input_fn:input_data for train minibatches
         train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=num_train_steps,
                                             hooks=[early_stopping_hook])
         eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn)
