@@ -1,0 +1,121 @@
+nohup: ignoring input
+usage: run.py
+                 ARG   VALUE
+__________________________________________________
+          batch_size = 64
+    bert_config_file = /home/macan/ml/data/chinese_L-12_H-768_A-12/bert_config.json
+                cell = lstm
+               clean = True
+                clip = 0.5
+            data_dir = /home/macan/ml/workspace/BERT-BiLSTM-CRF-NER/NERdata
+          device_map = 0
+             do_eval = True
+       do_lower_case = True
+          do_predict = True
+            do_train = True
+        dropout_rate = 0.5
+     filter_adam_var = False
+     init_checkpoint = /home/macan/ml/data/chinese_L-12_H-768_A-12/bert_model.ckpt
+          label_list = None
+       learning_rate = 1e-05
+           lstm_size = 128
+      max_seq_length = 128
+                 ner = ner
+          num_layers = 1
+    num_train_epochs = 10
+          output_dir = /home/macan/ml/workspace/BERT-BiLSTM-CRF-NER/output
+save_checkpoints_steps = 500
+  save_summary_steps = 500
+             verbose = False
+          vocab_file = /home/macan/ml/data/chinese_L-12_H-768_A-12/vocab.txt
+   warmup_proportion = 0.1
+
+WARNING:tensorflow:From /home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/python/framework/op_def_library.py:263: colocate_with (from tensorflow.python.framework.ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Colocations handled automatically by placer.
+WARNING:tensorflow:From /home/idm/dzt/models/nlp_model/bert-lstm-crf-ner/bert/modeling.py:359: calling dropout (from tensorflow.python.ops.nn_ops) with keep_prob is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `rate` instead of `keep_prob`. Rate should be set to `rate = 1 - keep_prob`.
+WARNING:tensorflow:From /home/idm/dzt/models/nlp_model/bert-lstm-crf-ner/bert/modeling.py:673: dense (from tensorflow.python.layers.core) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use keras.layers.dense instead.
+WARNING:tensorflow:From /home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/contrib/crf/python/ops/crf.py:213: dynamic_rnn (from tensorflow.python.ops.rnn) is deprecated and will be removed in a future version.
+Instructions for updating:
+Please use `keras.layers.RNN(cell)`, which is equivalent to this API
+WARNING:tensorflow:From /home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/python/ops/rnn.py:626: to_int32 (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use tf.cast instead.
+WARNING:tensorflow:From /home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/python/training/learning_rate_decay_v2.py:321: div (from tensorflow.python.ops.math_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+Deprecated in favor of operator or tf.math.divide.
+/home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/python/ops/gradients_impl.py:110: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+2019-04-09 09:38:55.359702: I tensorflow/core/platform/cpu_feature_guard.cc:141] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2019-04-09 09:38:55.367033: I tensorflow/core/platform/profile_utils/cpu_utils.cc:94] CPU Frequency: 2194690000 Hz
+2019-04-09 09:38:55.369278: I tensorflow/compiler/xla/service/service.cc:150] XLA service 0xb95c050 executing computations on platform Host. Devices:
+2019-04-09 09:38:55.369307: I tensorflow/compiler/xla/service/service.cc:158]   StreamExecutor device (0): <undefined>, <undefined>
+WARNING:tensorflow:From /home/idm/clients/env_py27/local/lib/python2.7/site-packages/tensorflow/python/util/tf_should_use.py:193: initialize_all_variables (from tensorflow.python.ops.variables) is deprecated and will be removed after 2017-03-02.
+Instructions for updating:
+Use `tf.global_variables_initializer` instead.
+Saving summary loss at 0
+Saving summary loss at 10
+Saving summary loss at 20
+Saving summary loss at 30
+Saving summary loss at 40
+Saving summary loss at 50
+Saving summary loss at 60
+Saving summary loss at 70
+Saving summary loss at 80
+Saving summary loss at 90
+Saving summary loss at 100
+Saving summary loss at 110
+Saving summary loss at 120
+Saving summary loss at 130
+Saving summary loss at 140
+Saving summary loss at 150
+Saving summary loss at 160
+Saving summary loss at 170
+Saving summary loss at 180
+Saving summary loss at 190
+Saving summary loss at 200
+Saving summary loss at 210
+Saving summary loss at 220
+Saving summary loss at 230
+Saving summary loss at 240
+Saving summary loss at 250
+Saving summary loss at 260
+Saving summary loss at 270
+Saving summary loss at 280
+Saving summary loss at 290
+Saving summary loss at 300
+Saving summary loss at 310
+Saving summary loss at 320
+Saving summary loss at 330
+Saving summary loss at 340
+Saving summary loss at 350
+Saving summary loss at 360
+Saving summary loss at 370
+Saving summary loss at 380
+Saving summary loss at 390
+Saving summary loss at 400
+Saving summary loss at 410
+Saving summary loss at 420
+Saving summary loss at 430
+Saving summary loss at 440
+Saving summary loss at 450
+Saving summary loss at 460
+Saving summary loss at 470
+Saving summary loss at 480
+Saving summary loss at 490
+Saving summary loss at 500
+Saving summary loss at 510
+Saving summary loss at 520
+Saving summary loss at 530
+Saving summary loss at 540
+Saving summary loss at 550
+Saving summary loss at 560
+Saving summary loss at 570
+Saving summary loss at 580
+Saving summary loss at 590
+Saving summary loss at 600
+Saving summary loss at 610

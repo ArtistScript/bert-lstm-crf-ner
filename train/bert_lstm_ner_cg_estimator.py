@@ -12,6 +12,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import sys
+#sys.path.append('/home/idm/dzt/models/nlp_model/bert-lstm-crf-ner/')
 import collections
 import os
 import numpy as np
@@ -647,9 +649,9 @@ def train(args):
         batch_size=args.batch_size)
     train_input=train_input_fn.make_one_shot_iterator()
     sess = tf.InteractiveSession()
-    max_step=100
+    max_step=5000
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./log' + '/train', sess.graph)
+    train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
     #一个batch的数据大小是64，repeat后，batch=32*2
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
@@ -749,7 +751,7 @@ def train(args):
 if __name__=='__main__':
     import os
     from train.train_helper import get_args_parser
-    from train.bert_lstm_ner import train
+    from train.bert_lstm_ner_cg_estimator import train
 
     args = get_args_parser()
     if True:
@@ -758,7 +760,7 @@ if __name__=='__main__':
         param_str = '\n'.join(['%20s = %s' % (k, v) for k, v in sorted(vars(args).items())])
         print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     # print(args)
-    operation_sys="windows"
+    operation_sys="linux"
     if operation_sys=="windows":
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
         args.task_name="NER"
@@ -788,7 +790,7 @@ if __name__=='__main__':
         args.train_batch_size = 32
         args.learning_rate = 2e-5
         args.num_train_epochs = 3.0
-        args.output_dir = "/home/idm/dzt/kaola-ner/output"
+        args.output_dir = "./output"
     else:
         print("Please input the ")
     train(args=args)

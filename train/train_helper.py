@@ -13,7 +13,7 @@ import os
 __all__ = ['get_args_parser']
 
 def get_args_parser():
-    from .bert_lstm_ner import __version__
+    from .bert_lstm_ner_cg_estimator import __version__
     parser = argparse.ArgumentParser()
     if os.name == 'nt':
         bert_path = 'F:\chinese_L-12_H-768_A-12'
