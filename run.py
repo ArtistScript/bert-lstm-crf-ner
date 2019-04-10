@@ -50,14 +50,14 @@ if __name__=='__main__':
         param_str = '\n'.join(['%20s = %s' % (k, v) for k, v in sorted(vars(args).items())])
         print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     # print(args)
-    operation_sys="linux"
+    operation_sys="windows"
     if operation_sys=="windows":
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
         args.task_name="NER"
         args.do_train=True
         args.do_eval=True
         args.do_predict=True
-        args.data_dir="D:/project/python_project/bert-lstm-crf-ner\data"
+        args.data_dir="D:/project/python_project/bert-lstm-crf-ner/data"
         args.vocab_file="D:/project/python_project/bert-lstm-crf-ner/bert\chinese_L-12_H-768_A-12/vocab.txt"
         args.bert_config_file="D:/project/python_project/bert-lstm-crf-ner/bert/chinese_L-12_H-768_A-12/bert_config.json"
         args.init_checkpoint="D:/project/python_project/bert-lstm-crf-ner/bert/chinese_L-12_H-768_A-12/bert_model.ckpt"

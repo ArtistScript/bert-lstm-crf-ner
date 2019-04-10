@@ -653,7 +653,7 @@ def train(args):
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
-    #一个batch的数据大小是64，repeat后，batch=32*2
+    #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
     init_op = tf.initialize_all_variables()
     sess = tf.Session()

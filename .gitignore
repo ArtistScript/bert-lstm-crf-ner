@@ -6,3 +6,4 @@ venv/
 output/
 data/
 log/
+train/bert_lstm_ner.py
