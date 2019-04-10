@@ -57,7 +57,7 @@ if __name__=='__main__':
         args.do_train=True
         args.do_eval=True
         args.do_predict=True
-        args.data_dir="D:/project/python_project/bert-lstm-crf-ner\data_demo"
+        args.data_dir="D:/project/python_project/bert-lstm-crf-ner\data"
         args.vocab_file="D:/project/python_project/bert-lstm-crf-ner/bert\chinese_L-12_H-768_A-12/vocab.txt"
         args.bert_config_file="D:/project/python_project/bert-lstm-crf-ner/bert/chinese_L-12_H-768_A-12/bert_config.json"
         args.init_checkpoint="D:/project/python_project/bert-lstm-crf-ner/bert/chinese_L-12_H-768_A-12/bert_model.ckpt"
@@ -72,7 +72,7 @@ if __name__=='__main__':
         args.do_train = True
         args.do_eval = True
         args.do_predict = True
-        args.data_dir = "/home/idm/dzt/kaola-ner/data_demo"
+        args.data_dir = "/home/idm/dzt/models/nlp_model/bert-lstm-crf-ner/data/"
         args.vocab_file = "/home/idm/dzt/kaola-ner/chinese_L-12_H-768_A-12/vocab.txt"
         args.bert_config_file = "/home/idm/dzt/kaola-ner/chinese_L-12_H-768_A-12/bert_config.json"
         args.init_checkpoint = "/home/idm/dzt/kaola-ner/chinese_L-12_H-768_A-12/bert_model.ckpt"
