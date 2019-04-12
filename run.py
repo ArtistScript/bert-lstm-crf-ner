@@ -44,11 +44,6 @@ if __name__=='__main__':
     from train.bert_lstm_ner_cg_estimator import train
 
     args = get_args_parser()
-    if True:
-        import sys
-
-        param_str = '\n'.join(['%20s = %s' % (k, v) for k, v in sorted(vars(args).items())])
-        print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     # print(args)
     operation_sys="windows"
     if operation_sys=="windows":
@@ -83,4 +78,9 @@ if __name__=='__main__':
         args.output_dir = "./output"
     else:
         print("Please input the ")
+    if True:
+        import sys
+
+        param_str = '\n'.join(['%20s = %s' % (k, v) for k, v in sorted(vars(args).items())])
+        print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     train(args=args)
