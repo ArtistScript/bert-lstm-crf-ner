@@ -50,7 +50,7 @@ if __name__=='__main__':
         param_str = '\n'.join(['%20s = %s' % (k, v) for k, v in sorted(vars(args).items())])
         print('usage: %s\n%20s   %s\n%s\n%s\n' % (' '.join(sys.argv), 'ARG', 'VALUE', '_' * 50, param_str))
     # print(args)
-    operation_sys="windows"
+    operation_sys="linux"
     if operation_sys=="windows":
         os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
         args.task_name="NER"
