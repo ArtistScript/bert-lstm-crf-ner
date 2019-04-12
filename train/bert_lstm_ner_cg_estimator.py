@@ -603,11 +603,15 @@ def train(args):
     num_labels=len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
-    total_loss, logits, trans, pred_ids = create_model(
+    total_loss, logits, trans, pred_ids, accuracy= create_model(
         bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+
+    #计算准确率,pred_ids是预测序列，
+
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
+    tf.summary.scalar('accuracy', accuracy)
     #加载预训练隐变量
     tvars = tf.trainable_variables()
     # 加载BERT模型，assignmen_map，加载的预训练变量值
@@ -649,7 +653,7 @@ def train(args):
         batch_size=args.batch_size)
     train_input=train_input_fn.make_one_shot_iterator()
     sess = tf.InteractiveSession()
-    max_step=5000
+    max_step=500
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
@@ -666,10 +670,10 @@ def train(args):
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
         if i%10==0:
-            train_summary = sess.run(merged, feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
+            train_summary, accu = sess.run([merged,accuracy], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
             train_writer.add_summary(train_summary, i)
-            print('Saving summary loss at %s'%(i))
+            print('accuracy %s at %s'%(accu,i))
     train_writer.close()
 
 

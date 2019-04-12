@@ -101,7 +101,15 @@ def create_model(bert_config, is_training, input_ids, input_mask,
                           dropout_rate=dropout_rate, initializers=initializers, num_labels=num_labels,
                           seq_length=max_seq_length, labels=labels, lengths=lengths, is_training=is_training)
     rst = blstm_crf.add_blstm_crf_layer(crf_only=True)
-    return rst
+    #计算标准准确率
+    #pred_ids是真实序列的长度
+    total_loss, logits, trans, pred_ids=rst
+    #对原来的标签进行截断，只获取真实的id
+    label_ids=labels[:,:lengths]
+    equal_int=tf.cast(tf.equal(pred_ids,label_ids),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
+    accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
+    # assert tf.shape(pred_ids)==tf.shape(label_ids)
+    return total_loss, logits, trans, pred_ids,label_ids,accuracy #原来是return rst
 
 
 def create_classification_model(bert_config, is_training, input_ids, input_mask, segment_ids, labels, num_labels):
