@@ -105,11 +105,12 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     #pred_ids是真实序列的长度
     total_loss, logits, trans, pred_ids=rst
     #对原来的标签进行截断，只获取真实的id
-    label_ids=labels[:,:lengths]
-    equal_int=tf.cast(tf.equal(pred_ids,label_ids),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
-    accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
+    # labels_shape=tf.shape(labels)
+    # label_ids=tf.slice(labels,[0,0],[labels_shape[0],lengths])#从坐标0,0开始切片，大小为样本大小行，lengths列
+    # equal_int=tf.cast(tf.equal(pred_ids,label_ids),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
+    # accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
     # assert tf.shape(pred_ids)==tf.shape(label_ids)
-    return total_loss, logits, trans, pred_ids,label_ids,accuracy #原来是return rst
+    return total_loss, logits, trans, pred_ids #原来是return rst
 
 
 def create_classification_model(bert_config, is_training, input_ids, input_mask, segment_ids, labels, num_labels):
