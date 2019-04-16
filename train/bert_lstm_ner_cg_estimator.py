@@ -670,7 +670,7 @@ def train(args):
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
         if i%10==0:
-            train_summary = sess.run([merged], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
+            train_summary = sess.run(merged, feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
             train_writer.add_summary(train_summary, i)
             print('summary at %s'%(i))
