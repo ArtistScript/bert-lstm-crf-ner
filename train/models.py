@@ -95,6 +95,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 算序列真实长度
     used = tf.sign(tf.abs(input_ids)) #+1.-1，0
     #计算真实数值的长度，值为0的不会被计算进去
+    #注意lengths是多行的
     lengths = tf.reduce_sum(used, reduction_indices=1)  # [batch_size] 大小的向量，包含了当前batch中的序列长度
     # 添加CRF output layer
     blstm_crf = BLSTM_CRF(embedded_chars=embedding, hidden_unit=lstm_size, cell_type=cell, num_layers=num_layers,
@@ -104,12 +105,12 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     #计算标准准确率
     #pred_ids是真实序列的长度
     total_loss, logits, trans, pred_ids=rst
-    #对原来的标签进行截断，只获取真实的id
+    #labels长度是填充后的，pred_ids是真实的长度
+    #-------------------------计算预测准确率------------------------------------
     # labels_shape=tf.shape(labels)
     # label_ids=tf.slice(labels,[0,0],[labels_shape[0],lengths])#从坐标0,0开始切片，大小为样本大小行，lengths列
     # equal_int=tf.cast(tf.equal(pred_ids,label_ids),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
     # accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
-    # assert tf.shape(pred_ids)==tf.shape(label_ids)
     return total_loss, logits, trans, pred_ids #原来是return rst
 
 

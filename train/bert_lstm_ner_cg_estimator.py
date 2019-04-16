@@ -674,6 +674,8 @@ def train(args):
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
             train_writer.add_summary(train_summary, i)
             print('summary at %s'%(i))
+            print(sess.run(tf.shape(pred_ids)))
+            print(sess.run(tf.shape(train_data['label_ids'])))
     train_writer.close()
 
 
