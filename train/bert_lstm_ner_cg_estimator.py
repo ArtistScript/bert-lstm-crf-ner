@@ -579,7 +579,8 @@ def train(args):
         tf.logging.info("  Batch size = %d", args.batch_size)
 
     #获取标签集合，是一个list
-    label_list = processor.get_labels()
+    # label_list = processor.get_labels()
+    label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
     # 构建graph
     # model_fn = model_fn_builder(
     #     bert_config=bert_config,
