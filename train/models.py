@@ -109,9 +109,9 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     #-------------------------计算预测准确率------------------------------------
     # labels_shape=tf.shape(labels)
     # label_ids=tf.slice(labels,[0,0],[labels_shape[0],lengths])#从坐标0,0开始切片，大小为样本大小行，lengths列
-    equal_int=tf.cast(tf.equal(pred_ids,labels),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
-    accuracy=tf.reduce_sum(equal_int)/tf.size(equal_int)# todo,转化成int32
-    return total_loss, logits, trans, pred_ids,accuracy #原来是return rst
+    # equal_int=tf.cast(tf.equal(pred_ids,labels),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
+    # accuracy=tf.reduce_sum(equal_int)/tf.size(equal_int)# todo,转化成int32
+    return total_loss, logits, trans, pred_ids #原来是return rst
 
 
 def create_classification_model(bert_config, is_training, input_ids, input_mask, segment_ids, labels, num_labels):
