@@ -660,9 +660,10 @@ def train(args):
     #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
     # init_op = tf.initialize_all_variables()
-    init_op= tf.global_variables_initializer()
+    # init_global= tf.global_variables_initializer()
     sess = tf.Session()
-    sess.run(init_op)
+    sess.run(tf.local_variables_initializer())
+    sess.run(tf.global_variables_initializer())
     #------------------问题--------------------------------------------------------------------------------------------
     for i in range(max_step):
 
