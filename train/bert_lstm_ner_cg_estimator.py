@@ -664,6 +664,12 @@ def train(args):
     sess = tf.Session()
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
+    print(label_list)
+    label_map = {}
+    # 1表示从1开始对label进行index化
+    for (i, label) in enumerate(label_list, 1):
+        label_map[label] = i
+    print(label_map)
     #------------------问题--------------------------------------------------------------------------------------------
     for i in range(max_step):
 
