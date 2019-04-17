@@ -679,10 +679,10 @@ def train(args):
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
         if i%10==0:
-            train_summary, accu, prediction = sess.run([merged,accuracy,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
+            train_summary, accu,acco, prediction = sess.run([merged,accuracy,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s'%(i,accu))
+            print('saving summary at %s, accuracy %s , %s'%(i,accu,acco))
             print(prediction)
             print(train_data['label_ids'])
     train_writer.close()
