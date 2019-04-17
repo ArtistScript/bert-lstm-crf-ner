@@ -612,7 +612,7 @@ def train(args):
 
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
-    tf.summary.scalar('accuracy', accuracy)
+    tf.summary.scalar('accuracy', acc_op)
     #加载预训练隐变量
     tvars = tf.trainable_variables()
     # 加载BERT模型，assignmen_map，加载的预训练变量值
