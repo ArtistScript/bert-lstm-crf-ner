@@ -105,13 +105,13 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     #计算标准准确率
     #pred_ids是真实序列的长度
     total_loss, logits, trans, pred_ids=rst
-    #labels长度是填充后的，pred_ids是真实的长度
+    #labels (64,128)，pred_ids (64,128)
     #-------------------------计算预测准确率------------------------------------
     # labels_shape=tf.shape(labels)
     # label_ids=tf.slice(labels,[0,0],[labels_shape[0],lengths])#从坐标0,0开始切片，大小为样本大小行，lengths列
-    # equal_int=tf.cast(tf.equal(pred_ids,label_ids),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
-    # accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
-    return total_loss, logits, trans, pred_ids #原来是return rst
+    equal_int=tf.cast(tf.equal(pred_ids,labels),dtype=tf.int32) #把两矩阵相等的元素，转化为1，不相等为0
+    accuracy=1.0*tf.reduce_sum(equal_int)/tf.size(equal_int)
+    return total_loss, logits, trans, pred_ids,accuracy #原来是return rst
 
 
 def create_classification_model(bert_config, is_training, input_ids, input_mask, segment_ids, labels, num_labels):
