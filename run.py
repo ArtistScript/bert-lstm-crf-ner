@@ -63,6 +63,7 @@ if __name__=='__main__':
         args.output_dir="D:/project/python_project/bert-lstm-crf-ner/output"
     elif operation_sys=="linux":
         # os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
+        args.device_map="1,2,3"
         os.environ['CUDA_VISIBLE_DEVICES'] = "1,2,3"
         args.task_name = "NER"
         args.do_train = True
