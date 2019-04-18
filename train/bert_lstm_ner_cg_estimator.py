@@ -663,8 +663,8 @@ def train(args):
     # init_op = tf.initialize_all_variables()
     # init_global= tf.global_variables_initializer()
     config = tf.ConfigProto(log_device_placement=False,allow_soft_placement=True)
-    config.gpu_options.allow_growth = True#动态申请显存
-    config.gpu_options.per_process_gpu_memory_fraction = 0.7
+    config.gpu_options.per_process_gpu_memory_fraction = 0.5
+    # config.gpu_options.allow_growth = True  # 动态申请显存
     sess = tf.Session(config=config)
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
