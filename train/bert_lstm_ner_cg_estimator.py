@@ -662,7 +662,7 @@ def train(args):
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
     # init_op = tf.initialize_all_variables()
     # init_global= tf.global_variables_initializer()
-    config = tf.ConfigProto()
+    config = tf.ConfigProto(log_device_placement=False,allow_soft_placement=True)
     config.gpu_options.allow_growth = True#动态申请显存
     config.gpu_options.per_process_gpu_memory_fraction = 0.7
     sess = tf.Session(config=config)
