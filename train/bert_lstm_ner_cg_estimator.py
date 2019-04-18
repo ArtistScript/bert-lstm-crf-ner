@@ -654,7 +654,7 @@ def train(args):
         batch_size=args.batch_size)
     train_input=train_input_fn.make_one_shot_iterator()
     sess = tf.InteractiveSession()
-    max_step=500
+    max_step=1000
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
