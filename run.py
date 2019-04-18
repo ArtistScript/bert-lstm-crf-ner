@@ -62,7 +62,8 @@ if __name__=='__main__':
         args.num_train_epochs=3.0
         args.output_dir="D:/project/python_project/bert-lstm-crf-ner/output"
     elif operation_sys=="linux":
-        os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
+        # os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
+        os.environ['CUDA_VISIBLE_DEVICES'] = "1,2,3"
         args.task_name = "NER"
         args.do_train = True
         args.do_eval = True
