@@ -600,16 +600,11 @@ def train(args):
     tf.summary.scalar('total_loss', total_loss)
     tf.summary.scalar('accuracy', acc_op)
     #---------------------输出验证集，测试集数据------------------------------
-    with tf.name_scope('input_evl'):
-        input_ids_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
-        input_mask_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
-        segment_ids_evl  = tf.placeholder(tf.int32, [None, args.max_seq_length])
-        label_ids_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
     is_training_evl = False #bert模型不采用training模式
     total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
-        bert_config, is_training_evl, input_ids_evl, input_mask_evl, segment_ids_evl, label_ids_evl,
+        bert_config, is_training_evl, input_ids, input_mask, segment_ids, label_ids,
         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-    accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids_evl, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
+    accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
     tf.summary.scalar('total_loss_evl', total_loss_evl)
     tf.summary.scalar('accuracy_evl', acc_op_evl)
     #----------------------------------------------------------------------------
