@@ -587,8 +587,9 @@ def train(args):
         input_mask = tf.placeholder(tf.int32, [None, args.max_seq_length])
         segment_ids  = tf.placeholder(tf.int32, [None, args.max_seq_length])
         label_ids = tf.placeholder(tf.int32, [None, args.max_seq_length])
-    #对参数赋值，对于训练模型来说
-    is_training=True
+        is_training = tf.placeholder(tf.bool)#这个应该也是动态变化的
+        #对参数赋值，对于训练模型来说
+
     num_labels=len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
@@ -600,13 +601,13 @@ def train(args):
     tf.summary.scalar('total_loss', total_loss)
     tf.summary.scalar('accuracy', acc_op)
     #---------------------输出验证集，测试集数据------------------------------
-    is_training_evl = False #bert模型不采用training模式
-    total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
-        bert_config, is_training_evl, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-    accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
-    tf.summary.scalar('total_loss_evl', total_loss_evl)
-    tf.summary.scalar('accuracy_evl', acc_op_evl)
+    # is_training_evl = False #bert模型不采用training模式
+    # total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
+    #     bert_config, is_training_evl, input_ids, input_mask, segment_ids, label_ids,
+    #     num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    # accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
+    # tf.summary.scalar('total_loss_evl', total_loss_evl)
+    # tf.summary.scalar('accuracy_evl', acc_op_evl)
     #----------------------------------------------------------------------------
     #加载预训练隐变量
     tvars = tf.trainable_variables()
@@ -678,12 +679,12 @@ def train(args):
         #把tensor转化为numpy输入
         train_data=sess.run(meta_train_data)
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
-                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
+                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:True})
         if i%10==0:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
-                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
-            acco_evl=sess.run(acc_op_evl,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
+                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:True})
+            acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
             train_writer.add_summary(train_summary, i)
             print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             print(prediction)
