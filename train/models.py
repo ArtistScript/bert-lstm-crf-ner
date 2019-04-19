@@ -80,7 +80,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 使用数据加载BertModel,获取对应的字embedding
     import tensorflow as tf
     from bert import modeling
-    is_training=tf.cond(tf.equal(is_training, tf.constant(True)), lambda: True, lambda: False) #左边lambda是true表达式
+    # is_training=tf.cond(tf.equal(is_training, tf.constant(True)), lambda: True, lambda: False) #左边lambda是true表达式
     model = modeling.BertModel(
         config=bert_config,
         is_training=is_training,#是否为训练模式

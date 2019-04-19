@@ -593,9 +593,19 @@ def train(args):
     num_labels=len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
-    total_loss, logits, trans, pred_ids= create_model(
-        bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
+    #create_model第一位为is_training
+    def train_model():
+        return create_model(
+        bert_config, True, input_ids, input_mask, segment_ids, label_ids,
         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    def eval_model():
+        return create_model(
+            bert_config, False, input_ids, input_mask, segment_ids, label_ids,
+            num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    # total_loss, logits, trans, pred_ids= create_model(
+    #     bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
+    #     num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    total_loss, logits, trans, pred_ids = tf.cond(tf.equal(is_training, tf.constant(True)), true_fn=train_model,false_fn=eval_model )
     accuracy, acc_op=tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)#计算准确率,pred_ids是预测序列，
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
