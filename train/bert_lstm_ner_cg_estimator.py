@@ -204,7 +204,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
     """
     label_map = {}
     # 1表示从1开始对label进行index化
-    for (i, label) in enumerate(label_list, 1):
+    for (i, label) in enumerate(label_list, 1): #i从1开始增加
         label_map[label] = i
     # 保存label->index 的map
     if not os.path.exists(os.path.join(output_dir, 'label2id.pkl')):
@@ -237,7 +237,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length, tokeni
     ntokens.append("[CLS]")  # 句子开始设置CLS 标志
     segment_ids.append(0)
     # append("O") or append("[CLS]") not sure!
-    label_ids.append(label_map["[CLS]"])  # O OR CLS 没有任何影响，不过我觉得O 会减少标签个数,不过句首和句尾使用不同的标志来标注，使用LCS 也没毛病
+    label_ids.append(label_map["[CLS]"])  # O OR CLS 没有任何影响，不过我觉得O 会减少标签个数,不过句首和句尾使用不同的标志来标注，使用CLS 也没毛病
     for i, token in enumerate(tokens):
         ntokens.append(token)
         segment_ids.append(0)
@@ -356,7 +356,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
     #通过map函数，调用_decode_record，把int64的数据转化成int32的数据，通过apply，把数据转化成batch的形式
     d = d.apply(tf.data.experimental.map_and_batch(lambda record: _decode_record(record, name_to_features),
                                                    batch_size=batch_size,
-                                                   num_parallel_calls=8,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
+                                                   # num_parallel_calls=8,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
+                                                   num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
                                                    drop_remainder=drop_remainder))
     d = d.prefetch(buffer_size=4)
 
@@ -581,19 +582,6 @@ def train(args):
     #获取标签集合，是一个list
     # label_list = processor.get_labels()
     label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
-    # 构建graph
-    # model_fn = model_fn_builder(
-    #     bert_config=bert_config,
-    #     num_labels=len(label_list) + 1,
-    #     init_checkpoint=args.init_checkpoint,
-    #     learning_rate=args.learning_rate,
-    #     num_train_steps=num_train_steps,
-    #     num_warmup_steps=num_warmup_steps,
-    #     args=args)
-
-    # params = {
-    #     'batch_size': args.batch_size
-    # }
     with tf.name_scope('input'):
         input_ids = tf.placeholder(tf.int32, [None, args.max_seq_length])
         input_mask = tf.placeholder(tf.int32, [None, args.max_seq_length])
@@ -607,16 +595,28 @@ def train(args):
     total_loss, logits, trans, pred_ids= create_model(
         bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-    accuracy, acc_op=tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)
-    #计算准确率,pred_ids是预测序列，
-
+    accuracy, acc_op=tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)#计算准确率,pred_ids是预测序列，
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
     tf.summary.scalar('accuracy', acc_op)
+    #---------------------输出验证集，测试集数据------------------------------
+    with tf.name_scope('input_evl'):
+        input_ids_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
+        input_mask_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
+        segment_ids_evl  = tf.placeholder(tf.int32, [None, args.max_seq_length])
+        label_ids_evl = tf.placeholder(tf.int32, [None, args.max_seq_length])
+    is_training_evl = False #bert模型不采用training模式
+    total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
+        bert_config, is_training_evl, input_ids_evl, input_mask_evl, segment_ids_evl, label_ids_evl,
+        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids_evl, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
+    tf.summary.scalar('total_loss_evl', total_loss_evl)
+    tf.summary.scalar('accuracy_evl', acc_op_evl)
+    #----------------------------------------------------------------------------
     #加载预训练隐变量
     tvars = tf.trainable_variables()
     # 加载BERT模型，assignmen_map，加载的预训练变量值
-    if init_checkpoint:
+    if init_checkpoint:  #只会运行一次
         (assignment_map, initialized_variable_names) = \
             modeling.get_assignment_map_from_checkpoint(tvars,
                                                         init_checkpoint)
@@ -653,11 +653,13 @@ def train(args):
         drop_remainder=False,
         batch_size=args.batch_size)
     train_input=train_input_fn.make_one_shot_iterator()
+    eval_input=eval_input_fn.make_one_shot_iterator()
     sess = tf.InteractiveSession()
     max_step=1000
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
+    meta_eval_data = eval_input.get_next() #获取验证数据集
     #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
     # init_op = tf.initialize_all_variables()
@@ -668,6 +670,7 @@ def train(args):
     sess = tf.Session(config=config)
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
+    eval_data = sess.run(meta_eval_data)
     print(label_list)
     label_map = {}
     # 1表示从1开始对label进行index化
@@ -678,14 +681,16 @@ def train(args):
     for i in range(max_step):
 
         #把tensor转化为numpy输入
-        train_data=sess.run([meta_train_data])[0]
+        train_data=sess.run(meta_train_data)
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
         if i%10==0:
-            train_summary, accu,acco, prediction = sess.run([merged,accuracy,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
+            train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
+            acco_evl=sess.run(acc_op_evl,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s , %s'%(i,accu,acco))
+            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             print(prediction)
             print(train_data['label_ids'])
     train_writer.close()

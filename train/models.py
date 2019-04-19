@@ -91,7 +91,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 获取对应的embedding 输入数据[batch_size, seq_length, embedding_size]
     embedding = model.get_sequence_output() #获取输入序列的向量表示，bert模型的最后一层
 
-    max_seq_length = embedding.shape[1].value
+    max_seq_length = embedding.shape[1].value #[batch_size, seq_length, hidden_size]
     # 算序列真实长度
     used = tf.sign(tf.abs(input_ids)) #+1.-1，0
     #计算真实数值的长度，值为0的不会被计算进去

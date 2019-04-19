@@ -50,7 +50,7 @@ class BLSTM_CRF(object):
             self.embedded_chars = tf.nn.dropout(self.embedded_chars, self.dropout_rate)
 
         if crf_only:
-            logits = self.project_crf_layer(self.embedded_chars)
+            logits = self.project_crf_layer(self.embedded_chars) #[batch_size, num_steps, num_tags]
         else:
             # blstm
             lstm_output = self.blstm_layer(self.embedded_chars)
