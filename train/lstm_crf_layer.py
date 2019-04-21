@@ -8,11 +8,11 @@ bert-blstm-crf layer
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from tensorflow.contrib import crf
-
+from tensorflow.python.ops import variable_scope as vs
 
 class BLSTM_CRF(object):
     def __init__(self, embedded_chars, hidden_unit, cell_type, num_layers, dropout_rate,
-                 initializers, num_labels, seq_length, labels, lengths, is_training):
+                 initializers, num_labels, seq_length, labels, lengths, is_training, reuse=False):
         """
         BLSTM-CRF 网络
         :param embedded_chars: Fine-tuning embedding input
@@ -39,12 +39,15 @@ class BLSTM_CRF(object):
         self.lengths = lengths
         self.embedding_dims = embedded_chars.shape[-1].value
         self.is_training = is_training
+        self.reuse=reuse
 
     def add_blstm_crf_layer(self, crf_only):
         """
         blstm-crf网络
         :return:
         """
+        if self.reuse:
+            vs.get_variable_scope().reuse_variables()
         if self.is_training:
             # lstm input dropout rate i set 0.9 will get best score
             self.embedded_chars = tf.nn.dropout(self.embedded_chars, self.dropout_rate)

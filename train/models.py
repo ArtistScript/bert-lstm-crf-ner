@@ -81,8 +81,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 使用数据加载BertModel,获取对应的字embedding
     import tensorflow as tf
     from bert import modeling
-    if reuse:
-        vs.get_variable_scope().reuse_variables()
+
     # is_training=tf.cond(tf.equal(is_training, tf.constant(True)), lambda: True, lambda: False) #左边lambda是true表达式
     model = modeling.BertModel(
         config=bert_config,
@@ -104,7 +103,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 添加CRF output layer
     blstm_crf = BLSTM_CRF(embedded_chars=embedding, hidden_unit=lstm_size, cell_type=cell, num_layers=num_layers,
                           dropout_rate=dropout_rate, initializers=initializers, num_labels=num_labels,
-                          seq_length=max_seq_length, labels=labels, lengths=lengths, is_training=is_training)
+                          seq_length=max_seq_length, labels=labels, lengths=lengths, is_training=is_training,reuse=reuse)
     rst = blstm_crf.add_blstm_crf_layer(crf_only=True)
     #计算标准准确率
     #pred_ids是真实序列的长度
