@@ -598,11 +598,11 @@ def train(args):
         input_mask_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
         segment_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
         label_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
-    with tf.variable_scope('model_compute') as scope: #variable_scope用于共享变量名
+    with tf.variable_scope('model_compute',reuse=tf.AUTO_REUSE) as scope: #variable_scope用于共享变量名
         total_loss, logits, trans, pred_ids = create_model(
             bert_config, True, input_ids, input_mask, segment_ids, label_ids,
             num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-        scope.reuse_variables()#共享变量
+        # scope.reuse_variables()#共享变量
         total_loss_eval, logits_eval, trans_eval, pred_ids_eval = create_model(
             bert_config, False, input_ids_eval, input_mask_eval, segment_ids_eval, label_ids_eval,
             num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
