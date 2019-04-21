@@ -598,7 +598,7 @@ def train(args):
         input_mask_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
         segment_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
         label_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
-    with tf.name_scope('model_compute') as scope:
+    with tf.variable_scope('model_compute') as scope: #variable_scope用于共享变量名
         total_loss, logits, trans, pred_ids = create_model(
             bert_config, True, input_ids, input_mask, segment_ids, label_ids,
             num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
