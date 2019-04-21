@@ -60,7 +60,7 @@ class BLSTM_CRF(object):
             # project
             logits = self.project_bilstm_layer(lstm_output)
         # crf
-        loss, trans = self.crf_layer(logits)
+        loss, trans = self.crf_layer(logits,reuse=self.reuse)
         # CRF decode, pred_ids 是一条最大概率的标注路径
         pred_ids, _ = crf.crf_decode(potentials=logits, transition_params=trans, sequence_length=self.lengths)
         return (loss, logits, trans, pred_ids)
@@ -150,13 +150,13 @@ class BLSTM_CRF(object):
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
             return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
 
-    def crf_layer(self, logits):
+    def crf_layer(self, logits,reuse=False):
         """
         calculate crf loss
         :param project_logits: [1, num_steps, num_tags]
         :return: scalar loss
         """
-        with tf.variable_scope("crf_loss"):
+        with tf.variable_scope("crf_loss",reuse=reuse):
             trans = tf.get_variable(
                 "transitions",
                 shape=[self.num_labels, self.num_labels],
