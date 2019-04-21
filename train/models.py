@@ -9,6 +9,7 @@
 
 from train.lstm_crf_layer import BLSTM_CRF
 from tensorflow.contrib.layers.python.layers import initializers
+from tensorflow.python.ops import variable_scope as vs
 
 
 __all__ = ['InputExample', 'InputFeatures', 'decode_labels', 'create_model', 'convert_id_str',
@@ -64,7 +65,7 @@ class DataProcessor(object):
 
 def create_model(bert_config, is_training, input_ids, input_mask,
                  segment_ids, labels, num_labels, use_one_hot_embeddings,
-                 dropout_rate=1.0, lstm_size=1, cell='lstm', num_layers=1):
+                 dropout_rate=1.0, lstm_size=1, cell='lstm', num_layers=1,reuse=False):
     """
     创建X模型
     :param bert_config: bert 配置
@@ -80,6 +81,8 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 使用数据加载BertModel,获取对应的字embedding
     import tensorflow as tf
     from bert import modeling
+    if reuse:
+        vs.get_variable_scope().reuse_variables()
     # is_training=tf.cond(tf.equal(is_training, tf.constant(True)), lambda: True, lambda: False) #左边lambda是true表达式
     model = modeling.BertModel(
         config=bert_config,
