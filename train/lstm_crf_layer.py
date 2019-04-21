@@ -135,8 +135,8 @@ class BLSTM_CRF(object):
         :param lstm_outputs: [batch_size, num_steps, emb_size]
         :return: [batch_size, num_steps, num_tags]
         """
-        with tf.variable_scope("project" if not name else name,reuse=True):
-            with tf.variable_scope("logits",reuse=True):
+        with tf.variable_scope("project" if not name else name):
+            with tf.variable_scope("logits"):
                 W = tf.get_variable("W", shape=[self.embedding_dims, self.num_labels],
                                     dtype=tf.float32, initializer=self.initializers.xavier_initializer())
 
