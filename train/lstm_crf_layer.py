@@ -8,11 +8,11 @@ bert-blstm-crf layer
 import tensorflow as tf
 from tensorflow.contrib import rnn
 from tensorflow.contrib import crf
-
+from tensorflow.python.ops import variable_scope as vs
 
 class BLSTM_CRF(object):
     def __init__(self, embedded_chars, hidden_unit, cell_type, num_layers, dropout_rate,
-                 initializers, num_labels, seq_length, labels, lengths, is_training):
+                 initializers, num_labels, seq_length, labels, lengths, is_training, reuse=False):
         """
         BLSTM-CRF 网络
         :param embedded_chars: Fine-tuning embedding input
@@ -39,25 +39,28 @@ class BLSTM_CRF(object):
         self.lengths = lengths
         self.embedding_dims = embedded_chars.shape[-1].value
         self.is_training = is_training
+        self.reuse=reuse
 
     def add_blstm_crf_layer(self, crf_only):
         """
         blstm-crf网络
         :return:
         """
+        # if self.reuse:
+        #     vs.get_variable_scope().reuse_variables()
         if self.is_training:
             # lstm input dropout rate i set 0.9 will get best score
             self.embedded_chars = tf.nn.dropout(self.embedded_chars, self.dropout_rate)
 
         if crf_only:
-            logits = self.project_crf_layer(self.embedded_chars) #[batch_size, num_steps, num_tags]
+            logits = self.project_crf_layer(self.embedded_chars,reuse=self.reuse) #[batch_size, num_steps, num_tags]
         else:
             # blstm
             lstm_output = self.blstm_layer(self.embedded_chars)
             # project
             logits = self.project_bilstm_layer(lstm_output)
         # crf
-        loss, trans = self.crf_layer(logits)
+        loss, trans = self.crf_layer(logits,reuse=self.reuse)
         # CRF decode, pred_ids 是一条最大概率的标注路径
         pred_ids, _ = crf.crf_decode(potentials=logits, transition_params=trans, sequence_length=self.lengths)
         return (loss, logits, trans, pred_ids)
@@ -129,14 +132,14 @@ class BLSTM_CRF(object):
                 pred = tf.nn.xw_plus_b(hidden, W, b)
             return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
 
-    def project_crf_layer(self, embedding_chars, name=None):
+    def project_crf_layer(self, embedding_chars, name=None,reuse=False):
         """
         hidden layer between input layer and logits
         :param lstm_outputs: [batch_size, num_steps, emb_size]
         :return: [batch_size, num_steps, num_tags]
         """
-        with tf.variable_scope("project" if not name else name):
-            with tf.variable_scope("logits"):
+        with tf.variable_scope("project" if not name else name,reuse=reuse):
+            with tf.variable_scope("logits",reuse=reuse):
                 W = tf.get_variable("W", shape=[self.embedding_dims, self.num_labels],
                                     dtype=tf.float32, initializer=self.initializers.xavier_initializer())
 
@@ -147,13 +150,13 @@ class BLSTM_CRF(object):
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
             return tf.reshape(pred, [-1, self.seq_length, self.num_labels])
 
-    def crf_layer(self, logits):
+    def crf_layer(self, logits,reuse=False):
         """
         calculate crf loss
         :param project_logits: [1, num_steps, num_tags]
         :return: scalar loss
         """
-        with tf.variable_scope("crf_loss"):
+        with tf.variable_scope("crf_loss",reuse=reuse):
             trans = tf.get_variable(
                 "transitions",
                 shape=[self.num_labels, self.num_labels],

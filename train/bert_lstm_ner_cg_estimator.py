@@ -356,8 +356,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
     #通过map函数，调用_decode_record，把int64的数据转化成int32的数据，通过apply，把数据转化成batch的形式
     d = d.apply(tf.data.experimental.map_and_batch(lambda record: _decode_record(record, name_to_features),
                                                    batch_size=batch_size,
-                                                   # num_parallel_calls=8,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
-                                                   num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
+                                                   num_parallel_calls=4,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
+                                                   # num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
                                                    drop_remainder=drop_remainder))
     d = d.prefetch(buffer_size=4)
 
@@ -582,30 +582,41 @@ def train(args):
     #获取标签集合，是一个list
     # label_list = processor.get_labels()
     label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
+    num_labels = len(label_list) + 1
+    init_checkpoint = args.init_checkpoint
+    learning_rate = args.learning_rate
+
     with tf.name_scope('input'):
         input_ids = tf.placeholder(tf.int32, [None, args.max_seq_length])
         input_mask = tf.placeholder(tf.int32, [None, args.max_seq_length])
         segment_ids  = tf.placeholder(tf.int32, [None, args.max_seq_length])
         label_ids = tf.placeholder(tf.int32, [None, args.max_seq_length])
-        is_training = tf.placeholder(tf.bool)#这个应该也是动态变化的
+        is_training=tf.placeholder(tf.bool)
         #对参数赋值，对于训练模型来说
 
-    num_labels=len(label_list) + 1
-    init_checkpoint = args.init_checkpoint
-    learning_rate = args.learning_rate
+    # with tf.name_scope('input_eval'):
+    #     input_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
+    #     input_mask_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
+    #     segment_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
+    #     label_ids_eval = tf.placeholder(tf.int32, [None, args.max_seq_length])
+    # with tf.name_scope('model_compute') as scope:
+    #     total_loss, logits, trans, pred_ids = create_model(
+    #         bert_config, True, input_ids, input_mask, segment_ids, label_ids,
+    #         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    #  scope.reuse_variables()
+
     #create_model第一位为is_training
     def train_model():
         return create_model(
         bert_config, True, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers,reuse=False)
     def eval_model():
         return create_model(
             bert_config, False, input_ids, input_mask, segment_ids, label_ids,
-            num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-    # total_loss, logits, trans, pred_ids= create_model(
-    #     bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
-    #     num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+            num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers,reuse=True)
+
     total_loss, logits, trans, pred_ids = tf.cond(tf.equal(is_training, tf.constant(True)), true_fn=train_model,false_fn=eval_model )
+
     accuracy, acc_op=tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)#计算准确率,pred_ids是预测序列，
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
