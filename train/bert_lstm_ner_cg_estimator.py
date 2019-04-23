@@ -704,10 +704,10 @@ def train(args):
         if i%10==0:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:True})
-            acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
+            # acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+            #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
+            print('saving summary at %s, accuracy %s, accuracy_eval'%(i,acco))
             print(prediction)
             print(train_data['label_ids'])
     train_writer.close()
