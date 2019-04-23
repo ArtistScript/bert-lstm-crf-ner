@@ -580,8 +580,8 @@ def train(args):
         tf.logging.info("  Batch size = %d", args.batch_size)
 
     #获取标签集合，是一个list
-    # label_list = processor.get_labels()
-    label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
+    label_list = processor.get_labels()
+    # label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
     num_labels = len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
