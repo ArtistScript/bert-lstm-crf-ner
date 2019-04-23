@@ -579,9 +579,11 @@ def train(args):
         tf.logging.info("  Num examples = %d", len(eval_examples))
         tf.logging.info("  Batch size = %d", args.batch_size)
 
-    #获取标签集合，是一个list
+    #获取标签集合，是一个list，如果是自己输入的话，这里一定不能搞错，会影响最后预测的类目
+    #一般label_list为所以的标签，[CLS],[SEP],O，这三个
     label_list = processor.get_labels()
     # label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
+    # label_list=['B-PER', '[SEP]', 'I-ORG', 'O', 'I-LOC', 'I-PER', 'B-ORG', 'B-LOC', '[CLS]', 'X']
     num_labels = len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
@@ -672,7 +674,7 @@ def train(args):
     train_input=train_input_fn.make_one_shot_iterator()
     eval_input=eval_input_fn.make_one_shot_iterator()
     sess = tf.InteractiveSession()
-    max_step=1000
+    max_step=1500
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('./log', sess.graph)
     meta_train_data = train_input.get_next()
@@ -704,10 +706,10 @@ def train(args):
         if i%10==0:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:True})
-            # acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-            #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
+            acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s, accuracy_eval'%(i,acco))
+            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             print(prediction)
             print(train_data['label_ids'])
     train_writer.close()
