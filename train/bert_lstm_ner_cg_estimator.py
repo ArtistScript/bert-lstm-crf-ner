@@ -702,7 +702,7 @@ def train(args):
         #把tensor转化为numpy输入
         train_data=sess.run(meta_train_data)
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
-                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:True})
+                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:False})
         if i%10==0:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:False})
