@@ -25,7 +25,7 @@ from train import tf_metrics
 from bert import modeling
 from bert import optimization
 from bert import tokenization
-
+from train import mymetrics
 # import
 
 from train.models import create_model, InputFeatures, InputExample
@@ -697,6 +697,7 @@ def train(args):
         label_map[label] = i
     print(label_map)
     #------------------问题--------------------------------------------------------------------------------------------
+
     for i in range(max_step):
 
         #把tensor转化为numpy输入
@@ -713,8 +714,9 @@ def train(args):
                                      segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
             train_writer.add_summary(train_summary, i)
             print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
-            print(prediction)
-            print(train_data['label_ids'])
+            # print(prediction)
+            # print(train_data['label_ids'])
+            mymetrics.compute(prediction,train_data['label_ids'],label_list)
     train_writer.close()
 
 
