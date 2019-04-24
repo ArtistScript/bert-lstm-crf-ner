@@ -701,15 +701,18 @@ def train(args):
 
         #把tensor转化为numpy输入
         train_data=sess.run(meta_train_data)
+        #is_traing,是否使用bert，以及lstm中的dropout层
+        #istraing，True，False混合使用，会涉及共享变量的问题，貌似共享变量后产生bug，暂时先false，不使用dropout。
+        #好像后面的variable_scope都reuse，也不会产生问题
         sess.run(train_op,feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:False})
         if i%10==0:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids'],is_training:False})
-            # acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-            #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
+            acco_evl=sess.run(acc_op,feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids'],is_training:False})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,0))
+            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             print(prediction)
             print(train_data['label_ids'])
     train_writer.close()
