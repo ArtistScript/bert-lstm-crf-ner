@@ -5,7 +5,7 @@ def compute(prediction,label_ids,label_list):
 
     :param prediction: [batch_size, sequence_length]
     :param label_ids:  [batch_size, sequence_length]
-    :param label_list: 参数传入，list or set
+    :param label_list: list or set
     :return:
     """
     prediction=np.array(prediction)
