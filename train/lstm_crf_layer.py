@@ -139,12 +139,18 @@ class BLSTM_CRF(object):
         :return: [batch_size, num_steps, num_tags]
         """
         with tf.variable_scope("project" if not name else name):
-            with tf.variable_scope("logits"):
-                W = tf.get_variable("W", shape=[self.embedding_dims, self.num_labels],
-                                    dtype=tf.float32, initializer=self.initializers.xavier_initializer())
+            with tf.variable_scope("logits") as scope:
+                try:
+                    W = tf.get_variable("W", shape=[self.embedding_dims, self.num_labels],
+                                        dtype=tf.float32, initializer=self.initializers.xavier_initializer())
 
-                b = tf.get_variable("b", shape=[self.num_labels], dtype=tf.float32,
-                                    initializer=tf.zeros_initializer())
+                    b = tf.get_variable("b", shape=[self.num_labels], dtype=tf.float32,
+                                        initializer=tf.zeros_initializer())
+                except ValueError:
+                    scope.reuse_variables()
+                    W = tf.get_variable("W")
+                    b = tf.get_variable("b")
+
                 output = tf.reshape(self.embedded_chars,
                                     shape=[-1, self.embedding_dims])  # [batch_size, embedding_dims]
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
@@ -156,11 +162,16 @@ class BLSTM_CRF(object):
         :param project_logits: [1, num_steps, num_tags]
         :return: scalar loss
         """
-        with tf.variable_scope("crf_loss"):
-            trans = tf.get_variable(
-                "transitions",
-                shape=[self.num_labels, self.num_labels],
-                initializer=self.initializers.xavier_initializer())
+        with tf.variable_scope("crf_loss") as scope:
+            try:
+                trans = tf.get_variable(
+                    "transitions",
+                    shape=[self.num_labels, self.num_labels],
+                    initializer=self.initializers.xavier_initializer())
+            except ValueError:
+                scope.reuse_variables()
+                trans = tf.get_variable(
+                    "transitions")
             if self.labels is None:
                 return None, trans
             else:
