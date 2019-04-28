@@ -146,11 +146,12 @@ class BLSTM_CRF(object):
 
                     b = tf.get_variable("b", shape=[self.num_labels], dtype=tf.float32,
                                         initializer=tf.zeros_initializer())
+                    tf.summary.histogram('weight_train', W)
                 except ValueError:
                     scope.reuse_variables()
                     W = tf.get_variable("W")
                     b = tf.get_variable("b")
-
+                    tf.summary.histogram('weight_eval', W)
                 output = tf.reshape(self.embedded_chars,
                                     shape=[-1, self.embedding_dims])  # [batch_size, embedding_dims]
                 pred = tf.tanh(tf.nn.xw_plus_b(output, W, b))
