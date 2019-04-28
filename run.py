@@ -80,6 +80,7 @@ if __name__=='__main__':
         args.learning_rate = 2e-5
         args.num_train_epochs = 3.0
         args.output_dir = "./output"
+        # args.dropout_rate=0.1  #ner模型的训练dropout率，在中间层可以设置大一点，比如0.5
     else:
         print("Please input the ")
     if True:

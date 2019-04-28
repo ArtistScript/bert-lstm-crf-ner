@@ -599,10 +599,10 @@ def train(args):
 
     total_loss, logits, trans, pred_ids = create_model(
         bert_config, True, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers,reuse=False)
+        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
     total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
         bert_config, False, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers, reuse=True)
+        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
     accuracy, acc_op = tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)   # 计算准确率,pred_ids是预测序列，
     accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
     #输出loss的smmary

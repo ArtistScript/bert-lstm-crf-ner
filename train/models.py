@@ -65,7 +65,7 @@ class DataProcessor(object):
 
 def create_model(bert_config, is_training, input_ids, input_mask,
                  segment_ids, labels, num_labels, use_one_hot_embeddings,
-                 dropout_rate=1.0, lstm_size=1, cell='lstm', num_layers=1,reuse=False):
+                 dropout_rate=1.0, lstm_size=1, cell='lstm', num_layers=1):
     """
     创建X模型
     :param bert_config: bert 配置
@@ -103,7 +103,7 @@ def create_model(bert_config, is_training, input_ids, input_mask,
     # 添加CRF output layer
     blstm_crf = BLSTM_CRF(embedded_chars=embedding, hidden_unit=lstm_size, cell_type=cell, num_layers=num_layers,
                           dropout_rate=dropout_rate, initializers=initializers, num_labels=num_labels,
-                          seq_length=max_seq_length, labels=labels, lengths=lengths, is_training=is_training,reuse=reuse)
+                          seq_length=max_seq_length, labels=labels, lengths=lengths, is_training=is_training)
     rst = blstm_crf.add_blstm_crf_layer(crf_only=True)
     #计算标准准确率
     #pred_ids是真实序列的长度
