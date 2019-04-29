@@ -658,10 +658,10 @@ def train(args):
         batch_size=args.batch_size)
     train_input=train_input_fn.make_one_shot_iterator()
     eval_input=eval_input_fn.make_one_shot_iterator()
-    sess = tf.InteractiveSession()
+    # sess = tf.InteractiveSession()
     max_step=1500
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./log_weight', sess.graph)
+
     meta_train_data = train_input.get_next()
     meta_eval_data = eval_input.get_next() #获取验证数据集
     #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
@@ -674,6 +674,7 @@ def train(args):
     sess = tf.Session(config=config)
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
+    train_writer = tf.summary.FileWriter('./log_weight', sess.graph)
     eval_data = sess.run(meta_eval_data)
     print(label_list)
     label_map = {}
@@ -695,8 +696,11 @@ def train(args):
         if i%10==1:
             train_summary,acco, prediction = sess.run([merged,acc_op,pred_ids], feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
                                      segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
-            acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
+            # acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+            #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
+            #预测训练集准确率，看下变量重用是否可行
+            acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
+                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
             train_writer.add_summary(train_summary, i)
             print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             # print(prediction)
