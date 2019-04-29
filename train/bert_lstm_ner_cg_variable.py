@@ -661,7 +661,7 @@ def train(args):
     sess = tf.InteractiveSession()
     max_step=1500
     merged = tf.summary.merge_all()
-    train_writer = tf.summary.FileWriter('./log', sess.graph)
+    train_writer = tf.summary.FileWriter('./log_weight', sess.graph)
     meta_train_data = train_input.get_next()
     meta_eval_data = eval_input.get_next() #获取验证数据集
     #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
