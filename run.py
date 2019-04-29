@@ -65,7 +65,7 @@ if __name__=='__main__':
     elif operation_sys=="linux":
         # os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
         args.device_map="1,2,3"
-        os.environ['CUDA_VISIBLE_DEVICES'] = ""
+        os.environ['CUDA_VISIBLE_DEVICES'] = args.device_map
         args.task_name = "NER"
         args.do_train = True
         args.do_eval = True
