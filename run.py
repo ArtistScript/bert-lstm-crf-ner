@@ -41,7 +41,7 @@ __all__ = ['__version__', 'DataProcessor', 'NerProcessor', 'write_tokens', 'conv
 if __name__=='__main__':
     import os
     from train.train_helper import get_args_parser
-    from train.bert_lstm_ner_cg_estimator import train
+    from train.bert_lstm_ner_cg_variable import train
 
     args = get_args_parser()
     # print(args)
@@ -76,7 +76,7 @@ if __name__=='__main__':
         args.init_checkpoint = "/home/idm/dzt/kaola-ner/chinese_L-12_H-768_A-12/bert_model.ckpt"
         args.max_seq_length = 128
         args.train_batch_size = 32
-        args.batch_size = 32  #这个是用于设置batch_size的
+        args.batch_size = 16  #这个是用于设置batch_size的
         args.learning_rate = 2e-5
         args.num_train_epochs = 3.0
         args.output_dir = "./output"
