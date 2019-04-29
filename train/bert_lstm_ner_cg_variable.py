@@ -597,14 +597,15 @@ def train(args):
         # is_training=tf.placeholder(tf.bool)
         #对参数赋值，对于训练模型来说
 
+    #is_training全部变成false，不使用dropout层
     total_loss, logits, trans, pred_ids = create_model(
-        bert_config, True, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
-    total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
         bert_config, False, input_ids, input_mask, segment_ids, label_ids,
         num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
+    # total_loss_evl, logits_evl, trans_evl, pred_ids_evl = create_model(
+    #     bert_config, False, input_ids, input_mask, segment_ids, label_ids,
+    #     num_labels, False, args.dropout_rate, args.lstm_size, args.cell, args.num_layers)
     accuracy, acc_op = tf.metrics.accuracy(labels=label_ids,predictions=pred_ids)   # 计算准确率,pred_ids是预测序列，
-    accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
+    # accuracy_evl, acc_op_evl = tf.metrics.accuracy(labels=label_ids, predictions=pred_ids_evl)  # 计算准确率,pred_ids是预测序列
     #输出loss的smmary
     tf.summary.scalar('total_loss', total_loss)
     tf.summary.scalar('accuracy', acc_op)
@@ -699,8 +700,8 @@ def train(args):
             # acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
             #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
             #预测训练集准确率，看下变量重用是否可行
-            acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:train_data['input_ids'],input_mask:train_data['input_mask'],
-                                     segment_ids:train_data['segment_ids'],label_ids:train_data['label_ids']})
+            acco_evl,prediction_eval=sess.run([acc_op,pred_ids],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
+                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
             train_writer.add_summary(train_summary, i)
             print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             # print(prediction)
