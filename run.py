@@ -41,7 +41,7 @@ __all__ = ['__version__', 'DataProcessor', 'NerProcessor', 'write_tokens', 'conv
 if __name__=='__main__':
     import os
     from train.train_helper import get_args_parser
-    from train.bert_lstm_ner_cg_variable import train
+    from train.bert_lstm_ner_cg_estimator import train
 
     args = get_args_parser()
     # print(args)
