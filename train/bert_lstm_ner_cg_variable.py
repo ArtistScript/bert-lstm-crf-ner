@@ -354,14 +354,15 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
         d = d.repeat()
         d = d.shuffle(buffer_size=300)
     #通过map函数，调用_decode_record，把int64的数据转化成int32的数据，通过apply，把数据转化成batch的形式
-    d = d.apply(tf.data.experimental.map_and_batch(lambda record: _decode_record(record, name_to_features),
-                                                   batch_size=batch_size,
-                                                   num_parallel_calls=4,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
-                                                   # num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
-                                                   drop_remainder=drop_remainder))
+        d = d.apply(tf.data.experimental.map_and_batch(lambda record: _decode_record(record, name_to_features),
+                                                       batch_size=batch_size,
+                                                       num_parallel_calls=4,  # 并行处理数据的CPU核心数量，不要大于你机器的核心数
+                                                       # num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
+                                                       drop_remainder=drop_remainder))
+    else:
+        d=d.map(lambda record: _decode_record(record, name_to_features))
     d = d.prefetch(buffer_size=4)
-    if not is_training:
-        d=d.apply(tf.data.experimental.unbatch())
+
     return d
 
 
