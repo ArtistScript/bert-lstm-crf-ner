@@ -657,14 +657,30 @@ def train(args):
         is_training=False,
         drop_remainder=False,
         batch_size=args.batch_size)
+    #构建预测集数据
+    predict_examples = processor.get_test_examples(args.data_dir)
+    predict_file = os.path.join(args.output_dir, "predict.tf_record")
+    #保存训练数据到本地
+    filed_based_convert_examples_to_features(predict_examples, label_list,
+                                             args.max_seq_length, tokenizer,
+                                             predict_file, args.output_dir, mode="test")
+    predict_drop_remainder = False
+    predict_input_fn = file_based_input_fn_builder(
+        input_file=predict_file,
+        seq_length=args.max_seq_length,
+        is_training=False,
+        drop_remainder=predict_drop_remainder)
+
     train_input=train_input_fn.make_one_shot_iterator()
     eval_input=eval_input_fn.make_one_shot_iterator()
+    predict_input=predict_input_fn.make_one_shot_iterator()
     # sess = tf.InteractiveSession()
     max_step=1500
     merged = tf.summary.merge_all()
 
     meta_train_data = train_input.get_next()
     meta_eval_data = eval_input.get_next() #获取验证数据集
+    meta_predict_data=predict_input.get_next()
     #参数batch_size是64，train_batch_size是32，不知道train_batch_size是什么用的
     #------------------解决FailedPreconditionError:问题，初始化所有变量，不知道这样会不会影响初始化的bert预训练变量------------------
     # init_op = tf.initialize_all_variables()
@@ -675,8 +691,9 @@ def train(args):
     sess = tf.Session(config=config)
     sess.run(tf.local_variables_initializer())
     sess.run(tf.global_variables_initializer())
-    train_writer = tf.summary.FileWriter('./log_weight', sess.graph)
+    train_writer = tf.summary.FileWriter('./log_predict', sess.graph)
     eval_data = sess.run(meta_eval_data)
+    predict_data=sess.run(meta_predict_data)
     print(label_list)
     label_map = {}
     # 1表示从1开始对label进行index化
@@ -700,13 +717,13 @@ def train(args):
             # acco_evl,prediction_eval=sess.run([acc_op_evl,pred_ids_evl],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
             #                          segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
             #预测训练集准确率，看下变量重用是否可行
-            acco_evl,prediction_eval=sess.run([acc_op,pred_ids],feed_dict={input_ids:eval_data['input_ids'],input_mask:eval_data['input_mask'],
-                                     segment_ids:eval_data['segment_ids'],label_ids:eval_data['label_ids']})
+            acco_evl,prediction_eval=sess.run([acc_op,pred_ids],feed_dict={input_ids:predict_data['input_ids'],input_mask:predict_data['input_mask'],
+                                     segment_ids:predict_data['segment_ids'],label_ids:predict_data['label_ids']})
             train_writer.add_summary(train_summary, i)
             print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
             # print(prediction)
             # print(train_data['label_ids'])
-            mymetrics.compute(prediction_eval,eval_data['label_ids'],label_list)
+            mymetrics.compute(prediction_eval,predict_data['label_ids'],label_list)
     train_writer.close()
 
 
