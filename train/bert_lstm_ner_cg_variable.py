@@ -669,7 +669,8 @@ def train(args):
         input_file=predict_file,
         seq_length=args.max_seq_length,
         is_training=False,
-        drop_remainder=predict_drop_remainder)
+        drop_remainder=predict_drop_remainder,
+        batch_size=args.batch_size)
 
     train_input=train_input_fn.make_one_shot_iterator()
     eval_input=eval_input_fn.make_one_shot_iterator()
@@ -720,7 +721,7 @@ def train(args):
             acco_evl,prediction_eval=sess.run([acc_op,pred_ids],feed_dict={input_ids:predict_data['input_ids'],input_mask:predict_data['input_mask'],
                                      segment_ids:predict_data['segment_ids'],label_ids:predict_data['label_ids']})
             train_writer.add_summary(train_summary, i)
-            print('saving summary at %s, accuracy %s, accuracy_eval %s'%(i,acco,acco_evl))
+            print('saving summary at %s, accuracy %s, accuracy_eval %s,length predict data %s'%(i,acco,acco_evl,len(predict_data['label_ids'])))
             # print(prediction)
             # print(train_data['label_ids'])
             mymetrics.compute(prediction_eval,predict_data['label_ids'],label_list)
