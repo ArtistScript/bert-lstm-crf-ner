@@ -360,7 +360,8 @@ def file_based_input_fn_builder(input_file, seq_length, is_training, drop_remain
                                                    # num_parallel_calls=tf.data.experimental.AUTOTUNE, #根据机器动态调整并行数
                                                    drop_remainder=drop_remainder))
     d = d.prefetch(buffer_size=4)
-
+    if not is_training:
+        d=d.apply(tf.data.experimental.unbatch())
     return d
 
 
