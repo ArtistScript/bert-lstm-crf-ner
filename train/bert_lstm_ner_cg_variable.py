@@ -684,7 +684,7 @@ def train(args):
     eval_input=eval_input_fn.make_one_shot_iterator()
     predict_input=predict_input_fn.make_one_shot_iterator()
     # sess = tf.InteractiveSession()
-    max_step=1500
+    max_step=2000
     merged = tf.summary.merge_all()
 
     meta_train_data = train_input.get_next()
