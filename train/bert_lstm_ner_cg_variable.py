@@ -593,6 +593,11 @@ def train(args):
     label_list = processor.get_labels()
     # label_list=["O", 'B-TIM', 'I-TIM', "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "X", "[CLS]", "[SEP]"]
     # label_list=['B-PER', '[SEP]', 'I-ORG', 'O', 'I-LOC', 'I-PER', 'B-ORG', 'B-LOC', '[CLS]', 'X']
+    prod_map = {"C材质": "C", "R人群": "R", "K口味": "K", "G功能呢": "G", "K款式": "K", "X剂型": "J", "S款式": "K", "J剂型": "J",
+                "N年龄": "N",
+                "G功能": "G", "Z品牌": "Z", "E品牌": "Z", "M明星": "M", "D地域": "D", "P品类": "P", "V规格": "V", "F风格": "F",
+                "Y颜色": "Y", "J季节": "J"}
+    label_list = prod_map.values()
     num_labels = len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
