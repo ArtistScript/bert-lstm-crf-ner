@@ -16,7 +16,7 @@ def compute(prediction,label_ids,label_list):
     for (i, label) in enumerate(label_list, 1):  # i从1开始增加
         label_map[label] = i
     id2label = {value: key for key, value in label_map.items()}
-    names=['I-LOC', 'I-ORG', 'B-ORG', 'B-PER','I-PER', 'B-LOC']
+    names=["C","R","K","X","G", "J", "N","M","Z","D","S","P","F", "Y","V"]
     nameids=[label_map[n] for n in names]
     for nid in nameids:
         pred=(prediction==nid)*1
