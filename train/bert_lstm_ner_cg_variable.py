@@ -597,7 +597,8 @@ def train(args):
                 "N年龄": "N",
                 "G功能": "G", "Z品牌": "Z", "E品牌": "Z", "M明星": "M", "D地域": "D", "P品类": "P", "V规格": "V", "F风格": "F",
                 "Y颜色": "Y", "J季节": "J"}
-    label_list = prod_map.values()
+    label_list = set(prod_map.values())
+    label_list = label_list.union(set(["X", "[CLS]", "[SEP]"]))
     num_labels = len(label_list) + 1
     init_checkpoint = args.init_checkpoint
     learning_rate = args.learning_rate
